@@ -20,21 +20,21 @@ bool is_number(const string& s)
 condition_variable cv;
 mutex mtx;
 atomic<bool> stop_flag{false};
-struct journalEntry {
+struct JournalEntry {
     string text;
     int level;
 };
-queue<journalEntry> journalQueue;
+queue<JournalEntry> journalQueue;
 
-int levelNotificationCheck(string& lvlNotif)
+int levelNotificationCheck(string& lvlNotifStr)
 {
-    if (is_number(lvlNotif))
+    if (is_number(lvlNotifStr))
     {
-        auto l_n = stoi(lvlNotif);
-        if (Journal::isRealImportanceLevel(Journal::Notification(l_n)))
-            return l_n;
+        auto lvlNotif = stoi(lvlNotifStr);
+        if (Journal::isImportanceLevelValid(Journal::Notification(lvlNotif)))
+            return lvlNotif;
     }
-    throw exception();
+    return -1;
     
 }
 void initializationApp(string& fileName, int& levelNotification)
@@ -44,11 +44,10 @@ void initializationApp(string& fileName, int& levelNotification)
     getline(cin, fileName);
     cout << "Введите уровень важности сообщения для файла логгирования (от 0 до 2)" << endl;
     getline(cin,newLvlNotificantion);
-    try
-    {
-        levelNotification = levelNotificationCheck(newLvlNotificantion);
-    }
-    catch(const exception&)
+
+    levelNotification = levelNotificationCheck(newLvlNotificantion);
+
+    if (levelNotification == -1)
     {
         cout << "Неверный уровень важности сообщения, попробуйте еще раз" << endl;
         initializationApp(fileName, levelNotification);
@@ -61,7 +60,7 @@ void initializationApp(string& fileName, int& levelNotification)
 
 }
 
-bool requestLogMessage(journalEntry& entry)
+bool requestLogMessage(JournalEntry& entry)
 {
     string message;
     string messageLvlNotif;
@@ -79,13 +78,13 @@ bool requestLogMessage(journalEntry& entry)
     if (is_number(messageLvlNotif))
     {
         auto levelMsg = stoi(messageLvlNotif);
-        if(Journal::isRealImportanceLevel(Journal::Notification(levelMsg)))
+        if(Journal::isImportanceLevelValid(Journal::Notification(levelMsg)))
             code = levelMsg;
     }
-    entry = journalEntry{message, code};
+    entry = JournalEntry{message, code};
     return true;
 }
-void putLogToProcessing(journalEntry& entry)
+void putLogToProcessing(JournalEntry& entry)
 {
     lock_guard<mutex> lock(mtx);
     journalQueue.push(entry);
@@ -99,7 +98,7 @@ void loggerProc(string fileName, int levelNotification)
         unique_lock<mutex> lock(mtx);
         cv.wait(lock);
         if(stop_flag) break;;
-        journalEntry userMessage = journalQueue.front();
+        JournalEntry userMessage = journalQueue.front();
         journalQueue.pop();
         lock.unlock();
         JournalObj.sendMessage(userMessage.text, Journal::Notification(userMessage.level));
@@ -117,7 +116,7 @@ int main()
     thread logger(loggerProc, fileName, levelNotification);
     while (isWork)
     {
-        journalEntry entry;
+        JournalEntry entry;
         isWork = requestLogMessage(entry);
         putLogToProcessing(entry);
     }

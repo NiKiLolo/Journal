@@ -21,7 +21,7 @@ class Journal
 		*/
 		int sendMessage(const std::string& text, Notification level);
 		//Проверка, является ли существующим уровнем важности
-		static bool isRealImportanceLevel(Notification level);
+		static bool isImportanceLevelValid(Notification level);
 	private:
 		std::string journalName;
 		Notification importanceLevel;

@@ -12,15 +12,18 @@ static string timeToString()
 	strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", localtime(&timeNow));
 	return buffer;
 }
+
 Journal::Journal(string jourName, Notification jourLvl)
 {
 	importanceLevel = jourLvl;
 	journalName = jourName + ".txt";
 }
+
 void Journal::setImportanceLevel(Notification level)
 {
 	importanceLevel = level;
 }
+
 int Journal::sendMessage(const string& text, Notification level = lUsual)
 {
 	if (level >= importanceLevel)
@@ -36,7 +39,8 @@ int Journal::sendMessage(const string& text, Notification level = lUsual)
 	}
 	return 0;
 }
-bool Journal::isRealImportanceLevel(Notification level) 
+
+bool Journal::isImportanceLevelValid(Notification level) 
 {
 	switch (level)
 	{
