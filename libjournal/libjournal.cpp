@@ -16,39 +16,34 @@ static string timeToString()
 Journal::Journal(string jourName, Notification jourLvl)
 {
 	importanceLevel = jourLvl;
-	journalName = jourName + ".txt";
+	if (jourName.size() > 0)
+		journalName = jourName + ".txt";
 }
 
 void Journal::setImportanceLevel(Notification level)
 {
 	importanceLevel = level;
 }
-
-int Journal::sendMessage(const string& text, Notification level = lUsual)
+int Journal::sendMessage(const string& text, Notification level)
 {
-	if (level >= importanceLevel)
-	{
-		ofstream ist(journalName.c_str(), ios::app);
-		if (ist)
-		{
-			ist << '[' << timeToString() << ']' << '[' << levelToStr(level) << ']' << text << endl;
-			return 1;
-		}
-		else
-			return JournalLoadException;
-	}
+	if (level < importanceLevel)
+		return 0;
+	
+	if (!isImportanceLevelValid(level) || !journalName.size())
+		return -1;
+	
+	ofstream logger(journalName.c_str(), ios::app);
+	if (!logger)
+		return -1;
+	
+	logger << '[' << timeToString() << ']' << '[' << levelToStr(level) << ']' << text << endl;
 	return 0;
 }
 
+
 bool Journal::isImportanceLevelValid(Notification level) 
 {
-	switch (level)
-	{
-		case lUsual: return true;
-		case lWarning: return true;
-		case lCritical: return true;
-		default: return false;
-	}
+	return (level >= lUsual && level <= lCritical);
 }
 
 string Journal::levelToStr(Notification level) const
@@ -58,7 +53,7 @@ string Journal::levelToStr(Notification level) const
 		case lUsual: return "Usual";
 		case lWarning: return "Warning";
 		case lCritical: return "Critical";
-		default: return errorUnknowImportanceLevel;
+		default: return "Unknown";
 	}
 }
 

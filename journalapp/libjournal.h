@@ -3,8 +3,6 @@
 #define LIBJOURNAL_H
 #include <iostream>
 
-#define errorUnknowImportanceLevel "Unknown"
-#define JournalLoadException 1000
 
 class Journal
 {
@@ -14,13 +12,15 @@ class Journal
 			Принимает: Название файла, Уровень важности сообщения
 		*/
 		Journal(std::string jourName, Notification jourLvl);
-		//Устанавливает уровень важности сообщения для журнала
+
+		/* Устанавливает уровень важности сообщения для журнала */
 		void setImportanceLevel(Notification level);
+
 		/* Отправляет сообщение в журнал
 			Принимает: Уровень важности сообщения, Текст сообщения
 		*/
 		int sendMessage(const std::string& text, Notification level);
-		//Проверка, является ли существующим уровнем важности
+
 		static bool isImportanceLevelValid(Notification level);
 	private:
 		std::string journalName;
