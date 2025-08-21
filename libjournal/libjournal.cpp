@@ -15,7 +15,11 @@ static string timeToString()
 
 Journal::Journal(string jourName, Notification jourLvl)
 {
-	importanceLevel = jourLvl;
+	if(isImportanceLevelValid(jourLvl))
+		importanceLevel = jourLvl;
+	else
+		importanceLevel = lUsual;
+	
 	if (jourName.size() > 0)
 		journalName = jourName + ".txt";
 }
@@ -26,11 +30,11 @@ void Journal::setImportanceLevel(Notification level)
 }
 int Journal::sendMessage(const string& text, Notification level)
 {
-	if (level < importanceLevel)
-		return 0;
-	
 	if (!isImportanceLevelValid(level) || !journalName.size())
 		return -1;
+
+	if (level < importanceLevel)
+		return 0;
 	
 	ofstream logger(journalName.c_str(), ios::app);
 	if (!logger)
