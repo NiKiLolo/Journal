@@ -8,7 +8,7 @@
 #include <chrono>
 #include <atomic>
 
-#include "libjournal.h"
+#include <libjournal.h>
 using namespace std;
 struct JournalEntry 
 {
@@ -69,7 +69,7 @@ void initializationApp(std::string & fileName, int & levelNotification)
 */
 bool requestLogMessage(JournalEntry & entry)
 {
-    cout << "Введите сообщение и его уровень важности(от 0 до 2, любое другое значение считается за 0 - ый уровень)" << endl;
+    cout << "Введите сообщение для записи в журнал и [Enter], затем уровень важности (0-2) и [Enter]" << endl;
 	string message;
     getline(cin, message);
     if (message == "exit")
